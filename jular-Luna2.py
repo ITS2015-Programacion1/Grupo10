@@ -10,28 +10,36 @@ teclas = {pilas.simbolos.a: 'izquierda',
               pilas.simbolos.j: 'boton'}
 mi_control = pilas.control.Control(teclas)
 
-balas_simples = pilas.actores.Bala
-
 
 def iniciarjuego():
     menu.eliminar()
-    fondo2=pilas.fondos.Cesped()
 
-    def Tanque1_destruido(Tanque1,Bala):
-        Tanque1.eliminar()
-        Bala.eliminar()
-        texto_victoria=pilasengine.actores.texto.Texto(pilas,texto="El Tanque Rojo es el vencedor")
-        texto_victoria.y = -100
-        texto_victoria.definir_color(pilas.colores.rojo)
-        jugador2.definir_radio_de_colision(0)
+    class BalaT(pilasengine.actores.Actor):
 
-    def Tanque2_destruido(Tanque2,Bala):
-        Tanque2.eliminar()
-        Bala.eliminar()
-        texto_victoria=pilasengine.actores.texto.Texto(pilas,texto="El Tanque Verde es el vencedor")
-        texto_victoria.y = -100
-        texto_victoria.definir_color(pilas.colores.verde)
-        jugador1.definir_radio_de_colision(0)
+
+        def __init__(self, pilas, x=0, y=0, rotacion=0, velocidad_maxima=9,
+                     angulo_de_movimiento=0):
+
+            super(BalaT, self).__init__(pilas=pilas, x=x, y=y)
+            self.imagen = pilas.imagenes.cargar("/home/julianluna/Grupo10/bala.png")
+            self.rotacion = 0
+
+            self.radio_de_colision = 5
+
+            self.hacer(pilas.comportamientos.Proyectil,
+                       velocidad_maxima=velocidad_maxima,
+                       aceleracion=1,
+                       angulo_de_movimiento=angulo_de_movimiento,
+                       gravedad=0)
+
+            self.aprender(self.pilas.habilidades.EliminarseSiSaleDePantalla)
+            self.cuando_se_elimina = None
+
+        def eliminar(self):
+            if self.cuando_se_elimina:
+                self.cuando_se_elimina(self)
+
+            super(BalaT, self).eliminar()
 
     class Tanque1(pilasengine.actores.Actor):
         def iniciar(self):
@@ -53,6 +61,15 @@ def iniciarjuego():
                 self.imagen.avanzar()
 
 
+
+    jugador1 = Tanque1(pilas)
+    jugador1.x =-100
+    jugador1.definir_escala(1)
+    jugador1.aprender(pilas.habilidades.LimitadoABordesDePantalla)
+    jugador1.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4)
+    jugador1.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=2,municion=BalaT)
+
+
     class Tanque2(pilasengine.actores.Actor):
         def iniciar(self):
             self.grilla = pilas.imagenes.cargar_grilla ("/home/julianluna/Grupo10/tanque2.png",8)
@@ -71,30 +88,38 @@ def iniciarjuego():
             if mi_control.abajo:
                 self.rotacion = 270
                 self.imagen.avanzar()
+            if mi_control.boton:
+                BalaT.rotacion = 180
 
 
-    jugador1 = Tanque1(pilas)
+
+           
+
     jugador2 = Tanque2(pilas)
-    jugador1.x =-100
     jugador2.x = 100
-    jugador1.definir_escala(1)
     jugador2.definir_escala(1)
-    jugador1.aprender(pilas.habilidades.LimitadoABordesDePantalla)
     jugador2.rotacion=180
-    jugador1.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4)
-    jugador2.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4,control=mi_control)
     jugador2.aprender(pilas.habilidades.LimitadoABordesDePantalla)
-    jugador1.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=2,grupo_enemigos=jugador2,cuando_elimina_enemigo=Tanque2_destruido)
-    jugador2.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=2,control=mi_control,grupo_enemigos=jugador1,cuando_elimina_enemigo=Tanque1_destruido)
-    jugador1.aprender(pilas.habilidades.PuedeExplotar)
-    jugador2.aprender(pilas.habilidades.PuedeExplotar)
+    jugador2.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4,control=mi_control)
+    jugador2.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=2,municion=BalaT,control=mi_control)
+
+    disparo = BalaT
+    
+    """def Tanque1_destruido(BalaT,Tanque1):
+        Tanque1.eliminar()
+        BalaT.eliminar()
+    pilas.colisiones.agregar(disparo,jugador1,Tanque1_destruido)
+ 
+
+    def Tanque2_destruido(BalaT,Tanque2):
+        Tanque2.eliminar()
+        BalaT.eliminar()
+    pilas.colisiones.agregar(disparo,jugador2,Tanque2_destruido)"""
 
 def Salir():
     pilas.terminar()
 
+
 menu=pilas.actores.Menu([("Iniciar juego", iniciarjuego),("Salir del juego", Salir)])
-
-
-
 
 pilas.ejecutar()
