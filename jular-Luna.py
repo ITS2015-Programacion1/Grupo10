@@ -1,6 +1,8 @@
 # coding: utf-8
 import pilasengine
-pilas = pilasengine.iniciar()
+pilas = pilasengine.iniciar(alto=640,ancho=800)
+pilas.fisica.gravedad_x=0
+pilas.fisica.gravedad_y=0
 #fondo=pilas.fondos.Fondo("fondo.jpg")
 #fondo.definir_escala(2.5)
 teclas = {pilas.simbolos.a: 'izquierda',
@@ -10,7 +12,7 @@ teclas = {pilas.simbolos.a: 'izquierda',
               pilas.simbolos.j: 'boton'}
 mi_control = pilas.control.Control(teclas)
 
-fondo2=pilas.fondos.Cesped()
+mapa = pilas.actores.MapaTiled("mapa.tmx")
 
 def Tanque1_destruido(Tanque1,Bala):
     Tanque1.eliminar()
@@ -30,7 +32,7 @@ def Tanque2_destruido(Tanque2,Bala):
 
 class Tanque1(pilasengine.actores.Actor):
     def iniciar(self):
-        self.grilla = pilas.imagenes.cargar_grilla ("/home/julianluna/Grupo10/tanque1.png",8)
+        self.grilla = pilas.imagenes.cargar_grilla ("tanque1.png",8)
         self.imagen = self.grilla
     
     def actualizar(self):
@@ -49,7 +51,7 @@ class Tanque1(pilasengine.actores.Actor):
 
 class Tanque2(pilasengine.actores.Actor):
     def iniciar(self):
-        self.grilla = pilas.imagenes.cargar_grilla ("/home/julianluna/Grupo10/tanque2.png",8)
+        self.grilla = pilas.imagenes.cargar_grilla ("tanque2.png",8)
         self.imagen = self.grilla
 
     def actualizar(self):
@@ -80,14 +82,19 @@ jugador2.aprender(pilas.habilidades.LimitadoABordesDePantalla)
 
 jugador2.rotacion=180
 
-jugador1.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4)
-jugador2.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4,control=mi_control)
-
 jugador1.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=2,grupo_enemigos=jugador2,cuando_elimina_enemigo=Tanque2_destruido)
 jugador2.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=2,control=mi_control,grupo_enemigos=jugador1,cuando_elimina_enemigo=Tanque1_destruido)
 
 jugador1.aprender(pilas.habilidades.PuedeExplotar)
 jugador2.aprender(pilas.habilidades.PuedeExplotar)
 
+rect1 = pilas.fisica.Rectangulo(-100,0,16,16,dinamica=False)
+rect2 = pilas.fisica.Rectangulo(100,0,16,16,dinamica=False)
+
+jugador1.aprender(pilas.habilidades.Imitar,rect1)
+jugador2.aprender(pilas.habilidades.Imitar,rect2)
+
+jugador1.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4)
+jugador2.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4,control=mi_control)
 
 pilas.ejecutar()
