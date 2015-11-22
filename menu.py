@@ -1,11 +1,3 @@
-import pilas
-
-pilas.iniciar()
- 
-def iniciarjuego():
-    pass    
-
-
-menu=pilas.actores.Menu([("iniciar juego", iniciarjuego)])
-
-pilas.ejecutar()
+class menu(pilasengine.escenas.Escena):
+	def iniciar(self):
+		m=pilas.actores

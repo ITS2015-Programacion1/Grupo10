@@ -3,8 +3,10 @@ import pilasengine
 pilas = pilasengine.iniciar(alto=640,ancho=800)
 pilas.fisica.gravedad_x=0
 pilas.fisica.gravedad_y=0
-#fondo=pilas.fondos.Fondo("fondo.jpg")
-#fondo.definir_escala(2.5)
+    #fondo=pilas.fondos.Fondo("fondo.jpg")
+    #fondo.definir_escala(2.5)
+    
+#class Juego(pilasengine.escenas.Escena):
 teclas = {pilas.simbolos.a: 'izquierda',
               pilas.simbolos.d: 'derecha',
               pilas.simbolos.w: 'arriba',
@@ -19,7 +21,7 @@ def Tanque1_destruido(Tanque1,Bala):
     Bala.eliminar()
     texto_victoria=pilasengine.actores.texto.Texto(pilas,texto="El Tanque Rojo es el vencedor")
     texto_victoria.y = -100
-    texto_victoria.definir_color(pilas.colores.rojo)
+    texto_victoria.definir_color(pilas.colores.negro)
     jugador2.definir_radio_de_colision(0)
 
 def Tanque2_destruido(Tanque2,Bala):
@@ -27,7 +29,7 @@ def Tanque2_destruido(Tanque2,Bala):
     Bala.eliminar()
     texto_victoria=pilasengine.actores.texto.Texto(pilas,texto="El Tanque Verde es el vencedor")
     texto_victoria.y = -100
-    texto_victoria.definir_color(pilas.colores.verde)
+    texto_victoria.definir_color(pilas.colores.negro)
     jugador1.definir_radio_de_colision(0)
 
 class Tanque1(pilasengine.actores.Actor):
@@ -96,5 +98,13 @@ jugador2.aprender(pilas.habilidades.Imitar,rect2)
 
 jugador1.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4)
 jugador2.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4,control=mi_control)
+
+
+"""class salir(pilasengine.escenas.Escena):
+    import sys
+    sys.exit(0)
+
+menu=([("",juego),("",)])"""
+
 
 pilas.ejecutar()
