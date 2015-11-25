@@ -3,8 +3,6 @@ import pilasengine
 import time
 import random
 pilas = pilasengine.iniciar(alto=640,ancho=800)
-pilas.fisica.gravedad_x=0
-pilas.fisica.gravedad_y=0
 puntajeJ1=0
 puntajeJ2=0
 
@@ -67,8 +65,7 @@ class Pantalla_puntaje(pilasengine.escenas.Escena):
         pilas.escenas.Juego()
     
     def salir(self):
-        global puntajeJ2
-        global puntajeJ1
+        global puntajeJ2, puntajeJ1
         puntajeJ1=0
         puntajeJ2=0
         self.menu.eliminar()
@@ -173,7 +170,7 @@ class Juego(pilasengine.escenas.Escena):
         LAbI2.escala = 0
         LAbI2.crear_figura_de_colision_rectangular(0,0,16,80)
 
-        paredes = [techo,suelo,paredD,paredI,obsAr1,obsAr2,obsAb1,obsAb2,obsDe1,obsDe2,obsIz1,obsIz2,LArD1,LArD2,LAbD1,LAbD2,LArI1,LArI2,LAbI1,LAbI2]
+        simon = [techo,suelo,paredD,paredI,obsAr1,obsAr2,obsAb1,obsAb2,obsDe1,obsDe2,obsIz1,obsIz2,LArD1,LArD2,LAbD1,LAbD2,LArI1,LArI2,LAbI1,LAbI2]
 
         def pasar_a_menu():
             pilas.escenas.Pantalla_puntaje()
@@ -183,26 +180,54 @@ class Juego(pilasengine.escenas.Escena):
             efecto = random.uniform(.25,.75)
             Tanque1.eliminar()
             Bala.eliminar()
+            puntajeJ2+=1
             texto_victoria=pilasengine.actores.texto.Texto(pilas,texto="El Tanque Rojo es el vencedor!")
             texto_victoria.y = -100
             texto_victoria.escala = (efecto,1),.5
             texto_victoria.definir_color(pilas.colores.negro)
-            jugador2.definir_radio_de_colision(0.1)
+            texto_guion=pilasengine.actores.texto.Texto(pilas,texto="Jugador 1:   -    :Jugador 2")
+            texto_guion.y=-200
+            texto_guion.definir_color(pilas.colores.negro)
+            texto_p1=pilasengine.actores.texto.Texto(pilas,texto=str(puntajeJ1))
+            texto_p1.y=-200
+            texto_p1.x=-12
+            texto_p1.definir_color(pilas.colores.negro)
+            texto_p2=pilasengine.actores.texto.Texto(pilas,texto=str(puntajeJ2))
+            texto_p2.y=-200
+            texto_p2.x=10
+            texto_p2.definir_color(pilas.colores.negro)
+            jugador2.definir_radio_de_colision(0)
             pilas.tareas.agregar(2.2,pasar_a_menu)
-            puntajeJ2+=1
-
+            
         def Tanque2_destruido(Tanque2,Bala):
             global puntajeJ1
             efecto = random.uniform(.25,.75)
             Tanque2.eliminar()
             Bala.eliminar()
+            puntajeJ1+=1
             texto_victoria=pilasengine.actores.texto.Texto(pilas,texto="El Tanque Verde es el vencedor!")
             texto_victoria.y = -100
             texto_victoria.escala = (efecto,1),.5
             texto_victoria.definir_color(pilas.colores.negro)
-            jugador1.definir_radio_de_colision(0.1)
+            texto_guion=pilasengine.actores.texto.Texto(pilas,texto="Jugador 1:   -    :Jugador 2")
+            texto_guion.y=-200
+            texto_guion.definir_color(pilas.colores.negro)
+            texto_p1=pilasengine.actores.texto.Texto(pilas,texto=str(puntajeJ1))
+            texto_p1.y=-200
+            texto_p1.x=-12
+            texto_p1.definir_color(pilas.colores.negro)
+            texto_p2=pilasengine.actores.texto.Texto(pilas,texto=str(puntajeJ2))
+            texto_p2.y=-200
+            texto_p2.x=10
+            texto_p2.definir_color(pilas.colores.negro)
+            jugador1.definir_radio_de_colision(0)
             pilas.tareas.agregar(2.2,pasar_a_menu)
-            puntajeJ1+=1
+            
+        class Balita(pilasengine.actores.Actor):
+        	
+        	def iniciar(self):
+        		self.imagen = pilas.imagenes.cargar("bala.png")
+        		self.radio_de_colision = 2
 
         class Tanque1(pilasengine.actores.Actor):
         
@@ -229,6 +254,7 @@ class Juego(pilasengine.escenas.Escena):
             def iniciar(self):
                 self.grilla = pilas.imagenes.cargar_grilla ("tanque2.png",8)
                 self.imagen = self.grilla
+                
 
             def actualizar(self):
                 if mi_control.izquierda:
@@ -255,8 +281,8 @@ class Juego(pilasengine.escenas.Escena):
 
         jugador2.rotacion=180
 
-        jugador1.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=1.25,grupo_enemigos=jugador2,cuando_elimina_enemigo=Tanque2_destruido)
-        jugador2.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=1.25,control=mi_control,grupo_enemigos=jugador1,cuando_elimina_enemigo=Tanque1_destruido)
+        jugador1.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=1,grupo_enemigos=jugador2,cuando_elimina_enemigo=Tanque2_destruido,municion=Balita)
+        jugador2.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=1,control=mi_control,grupo_enemigos=jugador1,cuando_elimina_enemigo=Tanque1_destruido,municion=Balita)
 
         jugador1.aprender(pilas.habilidades.PuedeExplotar)
         jugador2.aprender(pilas.habilidades.PuedeExplotar)
@@ -278,11 +304,12 @@ class Juego(pilasengine.escenas.Escena):
         jugador1.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4)
         jugador2.aprender(pilas.habilidades.MoverseConElTeclado,velocidad_maxima=2,direcciones=4,control=mi_control)
 
-        tanques = [Tanque1,Tanque2]
+        paredes = [medio,techo,suelo,paredI,paredD,obsAr1,obsAr2,obsAb1,obsAb2,obsDe1,obsDe2,obsIz1,obsIz2,LArD1,LArD2,LArI1,LArI2,LAbD1,LAbD2,LAbI1,LAbI2]
+        #def eliminar_bala(Balita,paredes):
+        	#Balita.eliminar()
+       #pilas.colisiones.agregar(,paredes,eliminar_bala)
 
-        def bala_a_pared(Bala,paredes):
-            Bala.eliminar()
-        pilas.colisiones.agregar(Bala,paredes,bala_a_pared)
+       # pilas.actores.vincular(Balita)
 
 pilas.escenas.vincular(Menu)
 pilas.escenas.vincular(Juego)
