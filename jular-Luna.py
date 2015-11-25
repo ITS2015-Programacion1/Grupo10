@@ -30,7 +30,7 @@ class Menu(pilasengine.escenas.Escena):
 class Instr(pilasengine.escenas.Escena):
     
     def iniciar(self):
-        instr=pilas.fondos.Noche()
+        instr=pilas.fondos.Fondo("Ayuda.png")
         self.menui=pilas.actores.Menu([("Comenzar Juego",self.comenzar),("Volver al Menu",self.salirm)])
         intro = pilas.musica.cargar("Battle City (NES) Music - Game Start.mp3")
         intro.reproducir()

@@ -281,7 +281,7 @@ class Juego(pilasengine.escenas.Escena):
 
         jugador2.rotacion=180
 
-        jugador1.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=1,grupo_enemigos=jugador2,cuando_elimina_enemigo=Tanque2_destruido,municion=Balita)
+        jugador1.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=100,grupo_enemigos=jugador2,cuando_elimina_enemigo=Tanque2_destruido,municion=Balita)
         jugador2.aprender(pilas.habilidades.Disparar,frecuencia_de_disparo=1,control=mi_control,grupo_enemigos=jugador1,cuando_elimina_enemigo=Tanque1_destruido,municion=Balita)
 
         jugador1.aprender(pilas.habilidades.PuedeExplotar)
